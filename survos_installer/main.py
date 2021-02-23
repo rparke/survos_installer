@@ -8,7 +8,10 @@ import yaml
 
 
 YAML_ENVIRONMENT = "/Users/richardparke/Documents/survos_installer/tests/survos2_clean_environment_linux.yml"
-
+NAME = "survos_installer"
+VERSION = "0.0.1"
+CHANNELS = ['pytorch', 'anaconda', 'defaults', 'conda-forge']
+LICENSE_FILE = "license.txt"
 
 
 class Installation_Generator():
@@ -17,14 +20,14 @@ class Installation_Generator():
                  environment_yaml,
                  name,
                  version,
-                 #channels,
+                 channels,
                  license_file,
                  post_install_file = "post_install.sh",
                  construct_file = "construct.yml"):
         self.environment_yaml = environment_yaml
         self.name = name
         self.version = version
-        #self.channels = channels
+        self.channels = channels
         self.license_file = license_file
         self.post_install_file = post_install_file
         self.construct_file = construct_file
@@ -52,7 +55,6 @@ class Installation_Generator():
     def print_parameters(self):
         self._parse_yaml()
         
-        
         print(f"name = {self.name}")
         print(f"version = {self.version}")
         print(f"license_file = {self.license_file}")
@@ -71,52 +73,65 @@ class Installation_Generator():
     
     def _parse_yaml(self):
         with open(self.environment_yaml) as f:
-            self.environment = yaml.safe_load(f)
+            #self.environment = yaml.safe_load(f)
+            return yaml.safe_load(f)
+
     
     
     def _get_conda_dependencies(self):
-        self._parse_yaml()
-        self.conda_dependencies = self.environment['dependencies'][:-1]
+        #self._parse_yaml()
+        yaml_environment = self._parse_yaml()
+        #self.conda_dependencies = self.environment['dependencies'][:-1]
+        return yaml_environment['dependencies'][:-1]
         
         
     def _get_pip_dependenceis(self):
-        self._parse_yaml()
-        self.pip_dependencies = list(self.environment['dependencies'][-1].values())[0]
-
+        #self._parse_yaml()
+        yaml_environment = self._parse_yaml()
+        #self.pip_dependencies = list(self.environment['dependencies'][-1].values())[0]
+        return list(yaml_environment['dependencies'][-1].values())[0]
         
         
     def _generate_constructor_environment_yaml(self):
-        self._get_conda_dependencies()
+        #self._get_conda_dependencies()
         yaml_template = {'name': self.name,
                          'version': self.version,
                          'channels': self.channels,
-                         'specs': self.conda_dependencies,
+                         'specs': self._get_conda_dependencies(),
                          'license_file': self.license_file}
         
-        yaml.dump(yaml_template, self.construct_file)
+
+        
+        with open(self.construct_file, "w") as f:
+            yaml.dump(yaml_template, f)
     
     
     def _generate_post_install_script(self):
         self._get_pip_dependencies()
         
         #bash preable
-        post_install_template = """"""
+        post_install_template = "#!/bin/bash \n"
+        #message indicating start of pip installation
+        post_install_template += 'echo "starting install of pip dependencies" \n'
         
         #Add pip install commands to the script
-        for dependency in self.pip_dependencies:
-            post_install_template.append(f"pip install {dependency}\n")
+        for dependency in self._get_conda_dependencies():
+            post_install_template += (f"pip install {dependency}\n")
             
         #save the post install script to file
         with open(self.post_install_file, "w") as f:
             f.write(post_install_template)
             
     def _cleanup_environment_yaml(self):
-        pass
+        os.system(f"rm {self.construct_file}")
     
     def _cleanup_post_install_script(self):
-        pass
+        os.system(f"rm {self.post_install_file}")
 
 
     def _run_constructor(self):
-        pass
+        os.system("constructor")
     
+    
+ig = Installation_Generator(YAML_ENVIRONMENT, NAME, VERSION,CHANNELS, LICENSE_FILE)  
+ig._generate_constructor_environment_yaml()
