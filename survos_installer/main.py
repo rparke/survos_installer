@@ -23,7 +23,7 @@ class Installation_Generator():
                  channels,
                  license_file,
                  post_install_file = "post_install.sh",
-                 construct_file = "construct.yml"):
+                 construct_file = "construct.yaml"):
         self.environment_yaml = environment_yaml
         self.name = name
         self.version = version
@@ -49,6 +49,8 @@ class Installation_Generator():
         
         
         #Clean up temporary install scripts
+        self._cleanup_environment_yaml()
+        self._cleanup_post_install_script()
     
     
     
@@ -85,7 +87,7 @@ class Installation_Generator():
         return yaml_environment['dependencies'][:-1]
         
         
-    def _get_pip_dependenceis(self):
+    def _get_pip_dependencies(self):
         #self._parse_yaml()
         yaml_environment = self._parse_yaml()
         #self.pip_dependencies = list(self.environment['dependencies'][-1].values())[0]
@@ -98,7 +100,8 @@ class Installation_Generator():
                          'version': self.version,
                          'channels': self.channels,
                          'specs': self._get_conda_dependencies(),
-                         'license_file': self.license_file}
+                         'license_file': self.license_file,
+                         'post_install': self.post_install_file}
         
 
         
@@ -116,7 +119,7 @@ class Installation_Generator():
         
         #Add pip install commands to the script
         for dependency in self._get_conda_dependencies():
-            post_install_template += (f"pip install {dependency}\n")
+            post_install_template += (f"$PREFIX/bin/pip install {dependency}\n")
             
         #save the post install script to file
         with open(self.post_install_file, "w") as f:
@@ -135,3 +138,5 @@ class Installation_Generator():
     
 ig = Installation_Generator(YAML_ENVIRONMENT, NAME, VERSION,CHANNELS, LICENSE_FILE)  
 ig._generate_constructor_environment_yaml()
+ig._generate_post_install_script()
+
