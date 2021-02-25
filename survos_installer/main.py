@@ -7,12 +7,14 @@ import yaml
 
 
 
-YAML_ENVIRONMENT = "/Users/richardparke/Documents/survos_installer/tests/survos2_clean_environment_linux.yml"
-NAME = "survos_installer"
+#YAML_ENVIRONMENT = "/Users/richardparke/Documents/survos_installer/tests/survos2_clean_environment_linux.yml"
+YAML_ENVIRONMENT = "../tests/survos2_clean_environment_linux.yml"
+
+NAME = "survos_2_installer"
 VERSION = "0.0.1"
 CHANNELS = ['pytorch', 'anaconda', 'defaults', 'conda-forge']
 LICENSE_FILE = "license.txt"
-
+POST_INSTALL_TEMPLATE = "post_install_template.txt"
 
 class Installation_Generator():
     
@@ -23,7 +25,8 @@ class Installation_Generator():
                  channels,
                  license_file,
                  post_install_file = "post_install.sh",
-                 construct_file = "construct.yaml"):
+                 construct_file = "construct.yaml",
+                 post_install_template = POST_INSTALL_TEMPLATE):
         self.environment_yaml = environment_yaml
         self.name = name
         self.version = version
@@ -31,7 +34,7 @@ class Installation_Generator():
         self.license_file = license_file
         self.post_install_file = post_install_file
         self.construct_file = construct_file
-        
+        self.post_install_template = post_install_template
         #Parameters for the construct.yaml template
         
     
@@ -118,9 +121,16 @@ class Installation_Generator():
         post_install_template += 'echo "starting install of pip dependencies" \n'
         
         #Add pip install commands to the script
-        for dependency in self._get_conda_dependencies():
+        for dependency in self._get_pip_dependencies():
             post_install_template += (f"$PREFIX/bin/pip install {dependency}\n")
-            
+          
+        
+        with open(self.post_install_template) as f:
+            for line in f:
+                post_install_template += (line + "\n")
+
+
+
         #save the post install script to file
         with open(self.post_install_file, "w") as f:
             f.write(post_install_template)
@@ -137,6 +147,7 @@ class Installation_Generator():
     
     
 ig = Installation_Generator(YAML_ENVIRONMENT, NAME, VERSION,CHANNELS, LICENSE_FILE)  
-ig._generate_constructor_environment_yaml()
+#ig._generate_constructor_environment_yaml()
 ig._generate_post_install_script()
+#ig.run()
 

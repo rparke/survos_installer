@@ -1,10 +1,16 @@
-name: survos2_env
+name: survos_2
+version: 0.0.1
+
+install_in_dependency_order: True
+
 channels:
   - pytorch
   - anaconda
   - defaults
   - conda-forge
-dependencies:
+
+specs:
+  - python
   - conda
   - _libgcc_mutex
   - _pytorch_select
@@ -59,6 +65,7 @@ dependencies:
   - jpeg
   - jxrlib
   - kiwisolver
+  - kornia
   - lcms2
   - libaec
   - libffi
@@ -144,72 +151,10 @@ dependencies:
   - zict
   - zlib
   - zstd
-  - pip:
-    - alabaster
-    - appdirs
-    - attrdict
-    - attrs
-    - babel
-    - backcall
-    - cachey
-    - cuda-slic
-    - docutils
-    - freetype-py
-    - humanize
-    - imagesize
-    - importlib-metadata
-    - iniconfig
-    - ipykernel
-    - ipython
-    - ipython-genutils
-    - jedi
-    - jupyter-client
-    - jupyter-core
-    - kornia
-    - mako
-    - more-itertools
-    - morphsnakes
-    - mrcfile
-    - napari
-    - napari-plugin-engine
-    - napari-svg
-    - nibabel
-    - nose
-    - numpydoc
-    - parse
-    - parso
-    - pexpect
-    - pickleshare
-    - pluggy
-    - prompt-toolkit
-    - ptyprocess
-    - py
-    - pycuda
-    - pydantic
-    - pygments
-    - pyopengl
-    - pytest
-    - python-deprecated
-    - pytools
-    - pyzmq
-    - qtconsole
-    - simpleitk
-    - snowballstemmer
-    - sphinx
-    - sphinxcontrib-applehelp
-    - sphinxcontrib-devhelp
-    - sphinxcontrib-htmlhelp
-    - sphinxcontrib-jsmath
-    - sphinxcontrib-qthelp
-    - sphinxcontrib-serializinghtml
-    - tensorly
-    - toml
-    - torchio
-    - tqdm
-    - traitlets
-    - vispy
-    - wcwidth
-    - wget
-    - wrapt
-    - zipp
+
+
+post_install: post_install.sh
+
+license_file: EULA.txt
+
 
