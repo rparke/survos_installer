@@ -1,5 +1,5 @@
-pwd
-env
-echo 'eval "$(conda shell.bash hook)"' >> $OLDPWD/export.txt
-echo "conda activate $PREFIX" >> $OLDPWD/export.txt
 
+echo 'eval "$(conda shell.bash hook)"' >> $OLDPWD/export.sh
+echo "conda activate $PREFIX" >> $OLDPWD/export.sh
+echo "conda env list" >> $OLDPWD/export.sh
+echo "conda list" >> $OLDPWD/export.sh

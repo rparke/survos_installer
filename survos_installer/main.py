@@ -127,7 +127,7 @@ class Installation_Generator():
         
         with open(self.post_install_template) as f:
             for line in f:
-                post_install_template += (line + "\n")
+                post_install_template += line
 
 
 
@@ -148,6 +148,6 @@ class Installation_Generator():
     
 ig = Installation_Generator(YAML_ENVIRONMENT, NAME, VERSION,CHANNELS, LICENSE_FILE)  
 #ig._generate_constructor_environment_yaml()
-ig._generate_post_install_script()
-#ig.run()
+#ig._generate_post_install_script()
+ig.run()
 
