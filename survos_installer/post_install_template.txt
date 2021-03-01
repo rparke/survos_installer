@@ -1,5 +1,4 @@
 
-echo 'eval "$(conda shell.bash hook)"' >> $OLDPWD/export.sh
-echo "conda activate $PREFIX" >> $OLDPWD/export.sh
-echo "conda env list" >> $OLDPWD/export.sh
-echo "conda list" >> $OLDPWD/export.sh
+echo 'eval "$(conda shell.bash hook)"' >> $OLDPWD/launch_survos.sh
+echo "conda activate $PREFIX" >> $OLDPWD/launch_survos.sh
+python -m survos2.frontend.runner
