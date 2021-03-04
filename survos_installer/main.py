@@ -15,6 +15,7 @@ VERSION = "0.0.1"
 CHANNELS = ['pytorch', 'anaconda', 'defaults', 'conda-forge']
 LICENSE_FILE = "license.txt"
 POST_INSTALL_TEMPLATE = "post_install_template.txt"
+INSTALLER_VERSION = "windows"
 
 class Installation_Generator():
     
@@ -26,7 +27,8 @@ class Installation_Generator():
                  license_file,
                  post_install_file = "post_install.sh",
                  construct_file = "construct.yaml",
-                 post_install_template = POST_INSTALL_TEMPLATE):
+                 post_install_template = POST_INSTALL_TEMPLATE,
+                 installer_version = INSTALLER_VERSION):
         self.environment_yaml = environment_yaml
         self.name = name
         self.version = version
@@ -35,6 +37,7 @@ class Installation_Generator():
         self.post_install_file = post_install_file
         self.construct_file = construct_file
         self.post_install_template = post_install_template
+        self.installer_version = installer_version
         #Parameters for the construct.yaml template
         
     
@@ -115,15 +118,24 @@ class Installation_Generator():
     def _generate_post_install_script(self):
         self._get_pip_dependencies()
         
-        #bash preable
-        post_install_template = "#!/bin/bash \n"
-        #message indicating start of pip installation
-        post_install_template += 'echo "starting install of pip dependencies" \n'
         
-        #Add pip install commands to the script
-        for dependency in self._get_pip_dependencies():
-            post_install_template += (f"$PREFIX/bin/pip install {dependency}\n")
+        #bash preable
+        if self.installer_version == 'linux':
+            post_install_template = "#!/bin/bash \n"
+       
+            #Add pip install commands to the script
+            for dependency in self._get_pip_dependencies():
+                post_install_template += (f"$PREFIX/bin/pip install {dependency}\n")
+                
+         
+        
           
+        
+        if self.installer_version == 'windows':
+            post_install_template = "call %~dp0..\Scripts\activate.bat"
+            
+            for dependency in self._get_pip_dependencies():
+                post_install_template += (f"pip install {dependency}\n")
         
         with open(self.post_install_template) as f:
             for line in f:
