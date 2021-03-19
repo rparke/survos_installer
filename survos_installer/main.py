@@ -14,8 +14,24 @@ NAME = "survos_2_installer"
 VERSION = "0.0.1"
 CHANNELS = ['pytorch', 'anaconda', 'defaults', 'conda-forge']
 LICENSE_FILE = "license.txt"
-POST_INSTALL_TEMPLATE = "post_install_template.txt"
+POST_INSTALL_TEMPLATE_BASH = "post_install_template_bash.txt"
+POST_INSTALL_TEMPLATE_WINDOWS = "post_install_template_bash_windows.txt"
 INSTALLER_VERSION = "windows"
+
+# Pytorch is a large dependency that pushes NSIS above its 2GB limit for windows
+# The following list should contain pytorch and any packages that depend on pytorch
+# to prevent it being distributed within the installer file.
+# This can be verified by creating the install environment with the following
+# > conda env create -f <yaml file containing environment>
+# > conda activate <environment name/ or path>
+# and then listing the packages that have pytorch as a dependency using conda-tree
+# > conda install -c conda-forge conda-tree
+# > conda-tree whoneeds pytorch
+WINDOWS_CONDA_MIGRATION_TO_BATCH = ['pytorch', 'torchvision']
+
+
+
+
 
 class Installation_Generator():
     
@@ -25,18 +41,23 @@ class Installation_Generator():
                  version,
                  channels,
                  license_file,
-                 post_install_file = "post_install.sh",
                  construct_file = "construct.yaml",
-                 post_install_template = POST_INSTALL_TEMPLATE,
+                 post_install_template_bash = POST_INSTALL_TEMPLATE_BASH,
+                 post_install_template_windows = POST_INSTALL_TEMPLATE_WINDOWS,
                  installer_version = INSTALLER_VERSION):
         self.environment_yaml = environment_yaml
         self.name = name
         self.version = version
         self.channels = channels
         self.license_file = license_file
-        self.post_install_file = post_install_file
+        if installer_version == "windows":
+            self.post_install_file = "post_install.bat"
+            self.post_install_template = post_install_template_bash
+        else:
+            self.post_install_file = "post_install.sh"
+            self.post_install_template = post_install_template_windows
+        
         self.construct_file = construct_file
-        self.post_install_template = post_install_template
         self.installer_version = installer_version
         #Parameters for the construct.yaml template
         
@@ -68,15 +89,6 @@ class Installation_Generator():
         print(f"license_file = {self.license_file}")
         
     
-    def _print_current_working_directory(self):
-        print(f"Current working directory: {os.getcwd()}")
-        answer = input("Is this the directory containing your environment.yml file?")
-        if answer == "yes" or answer == "y":
-            pass
-        else:
-            new_directory = input("Type in the name of your new directory")
-            os.chdir(new_directory)
-        print(f"Executing from current working directory: {os.getcwd()}")
         
     
     def _parse_yaml(self):
@@ -94,9 +106,7 @@ class Installation_Generator():
         
         
     def _get_pip_dependencies(self):
-        #self._parse_yaml()
         yaml_environment = self._parse_yaml()
-        #self.pip_dependencies = list(self.environment['dependencies'][-1].values())[0]
         return list(yaml_environment['dependencies'][-1].values())[0]
         
         
@@ -132,7 +142,8 @@ class Installation_Generator():
           
         
         if self.installer_version == 'windows':
-            post_install_template = "call %~dp0..\Scripts\activate.bat"
+            post_install_template = "call %~dp0..\Scripts\activate.bat\n"
+            
             
             for dependency in self._get_pip_dependencies():
                 post_install_template += (f"pip install {dependency}\n")
@@ -140,6 +151,7 @@ class Installation_Generator():
         with open(self.post_install_template) as f:
             for line in f:
                 post_install_template += line
+                
 
 
 
