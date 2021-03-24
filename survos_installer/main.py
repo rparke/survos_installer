@@ -7,16 +7,18 @@ import yaml
 
 
 
-#YAML_ENVIRONMENT = "/Users/richardparke/Documents/survos_installer/tests/survos2_clean_environment_linux.yml"
-YAML_ENVIRONMENT = "../tests/survos2_clean_environment_linux.yml"
 
-NAME = "survos_2_installer"
-VERSION = "0.0.1"
-CHANNELS = ['pytorch', 'anaconda', 'defaults', 'conda-forge']
-LICENSE_FILE = "license.txt"
-POST_INSTALL_TEMPLATE_BASH = "post_install_template_bash.txt"
-POST_INSTALL_TEMPLATE_WINDOWS = "post_install_template_bash_windows.txt"
-INSTALLER_VERSION = "windows"
+
+
+# Parameters for installer (may move to config.yaml file for ease of use)
+#YAML_ENVIRONMENT = "../tests/survos2_clean_environment_linux.yml"
+#NAME = "survos_2_installer"
+#VERSION = "0.0.1"
+#CHANNELS = ['pytorch', 'anaconda', 'defaults', 'conda-forge']
+#LICENSE_FILE = "license.txt"
+#POST_INSTALL_TEMPLATE_BASH = "post_install_template_bash.txt"
+#POST_INSTALL_TEMPLATE_WINDOWS = "post_install_template_bash_windows.txt"
+#INSTALLER_VERSION = "windows"
 
 # Pytorch is a large dependency that pushes NSIS above its 2GB limit for windows
 # The following list should contain pytorch and any packages that depend on pytorch
@@ -27,7 +29,21 @@ INSTALLER_VERSION = "windows"
 # and then listing the packages that have pytorch as a dependency using conda-tree
 # > conda install -c conda-forge conda-tree
 # > conda-tree whoneeds pytorch
-WINDOWS_CONDA_MIGRATION_TO_BATCH = ['pytorch', 'torchvision']
+#WINDOWS_CONDA_MIGRATION_TO_BATCH = ['pytorch', 'torchvision']
+
+
+CONFIG_FILE = "../config.yaml"
+
+with open(CONFIG_FILE, "r") as f:
+    config_data = yaml.safe_load(f)
+YAML_ENVIRONMENT = config_data['YAML_ENVIRONMENT']
+NAME = config_data['NAME']
+VERSION = config_data['VERSION']
+CHANNELS = config_data["CHANNELS"]
+LICENSE_FILE = config_data["LICENSE_FILE"]
+POST_INSTALL_TEMPLATE_BASH = config_data["POST_INSTALL_TEMPLATE_BASH"]
+POST_INSTALL_TEMPLATE_WINDOWS = config_data["POST_INSTALL_TEMPLATE_WINDOWS"]
+INSTALLER_VERSION = config_data["INSTALLER_VERSION"]
 
 
 
@@ -97,7 +113,7 @@ class Installation_Generator():
             return yaml.safe_load(f)
 
     
-    
+
     def _get_conda_dependencies(self):
         #self._parse_yaml()
         yaml_environment = self._parse_yaml()
@@ -173,5 +189,5 @@ class Installation_Generator():
 ig = Installation_Generator(YAML_ENVIRONMENT, NAME, VERSION,CHANNELS, LICENSE_FILE)  
 #ig._generate_constructor_environment_yaml()
 #ig._generate_post_install_script()
-ig.run()
+#ig.run()
 
