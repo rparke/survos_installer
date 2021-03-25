@@ -8,18 +8,6 @@ import yaml
 
 
 
-
-
-# Parameters for installer (may move to config.yaml file for ease of use)
-#YAML_ENVIRONMENT = "../tests/survos2_clean_environment_linux.yml"
-#NAME = "survos_2_installer"
-#VERSION = "0.0.1"
-#CHANNELS = ['pytorch', 'anaconda', 'defaults', 'conda-forge']
-#LICENSE_FILE = "license.txt"
-#POST_INSTALL_TEMPLATE_BASH = "post_install_template_bash.txt"
-#POST_INSTALL_TEMPLATE_WINDOWS = "post_install_template_bash_windows.txt"
-#INSTALLER_VERSION = "windows"
-
 # Pytorch is a large dependency that pushes NSIS above its 2GB limit for windows
 # The following list should contain pytorch and any packages that depend on pytorch
 # to prevent it being distributed within the installer file.
@@ -32,7 +20,7 @@ import yaml
 #WINDOWS_CONDA_MIGRATION_TO_BATCH = ['pytorch', 'torchvision']
 
 
-CONFIG_FILE = "../config.yaml"
+CONFIG_FILE = "config.yaml"
 
 with open(CONFIG_FILE, "r") as f:
     config_data = yaml.safe_load(f)
@@ -118,7 +106,14 @@ class Installation_Generator():
         #self._parse_yaml()
         yaml_environment = self._parse_yaml()
         #self.conda_dependencies = self.environment['dependencies'][:-1]
-        return yaml_environment['dependencies'][:-1]
+        if self.installer_version.lower() == "linux":
+            return yaml_environment['dependencies'][:-1]
+        
+        if self.installer_version.lower() == "windows":
+            yaml_dependencies_initial = yaml_environment['dependencies'][:-1]
+            for dep in yaml_dependencies_initial:
+                pass
+            
         
         
     def _get_pip_dependencies(self):
@@ -145,22 +140,18 @@ class Installation_Generator():
         self._get_pip_dependencies()
         
         
-        #bash preable
-        if self.installer_version == 'linux':
+        #Linux Version
+        if self.installer_version.lower() == 'linux':
             post_install_template = "#!/bin/bash \n"
-       
-            #Add pip install commands to the script
             for dependency in self._get_pip_dependencies():
                 post_install_template += (f"$PREFIX/bin/pip install {dependency}\n")
                 
          
         
           
-        
-        if self.installer_version == 'windows':
+        #Windows Version
+        if self.installer_version.lower() == 'windows':
             post_install_template = "call %~dp0..\Scripts\activate.bat\n"
-            
-            
             for dependency in self._get_pip_dependencies():
                 post_install_template += (f"pip install {dependency}\n")
         
