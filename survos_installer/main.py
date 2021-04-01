@@ -13,7 +13,7 @@ import yaml
 
 
 #Load the config file
-CONFIG_FILE = "../config.yaml"
+CONFIG_FILE = "config.yaml"
 with open(CONFIG_FILE, "r") as f:
     config_data = yaml.safe_load(f)
 YAML_ENVIRONMENT = config_data['YAML_ENVIRONMENT']
@@ -42,7 +42,8 @@ class Installation_Generator():
                  post_install_template_bash = POST_INSTALL_TEMPLATE_BASH,
                  post_install_template_windows = POST_INSTALL_TEMPLATE_WINDOWS,
                  installer_version = INSTALLER_VERSION,
-                 windows_relocate = WINDOWS_RELOCATE):
+                 windows_relocate = WINDOWS_RELOCATE,
+                 windows_yaml_file_name = "windows_update.yaml"):
         self.environment_yaml = environment_yaml
         self.name = name
         self.version = version
@@ -58,6 +59,7 @@ class Installation_Generator():
         self.construct_file = construct_file
         self.installer_version = installer_version
         self.windows_relocate = windows_relocate
+        self.windows_yaml_file_name = windows_yaml_file_name
         #Parameters for the construct.yaml template
         
     
@@ -72,6 +74,9 @@ class Installation_Generator():
         #generates post_install script used to handly installation of pip dependencies
         #and generation of launcher
         self._generate_post_install_script()
+        
+        if self.installer_version.lower() == "windows":
+            self._generate_windows_yaml_update(self.windows_yaml_file_name)
         
         # Call conda constructor on the temp yaml and sh files created above
         # and create an installer in the same directory
@@ -145,11 +150,8 @@ class Installation_Generator():
             #Add pip install commands to the script
             for dependency in self._get_pip_dependencies():
                 post_install_template += (f"$PREFIX/bin/pip install {dependency}\n")
-            
-
-         
-        
-          
+    
+                  
         
         if self.installer_version == 'windows':
             
@@ -186,13 +188,12 @@ class Installation_Generator():
             f.write(post_install_template)
 
 
-
-
-        #save the post install script to file
-        with open(self.post_install_file, "w") as f:
-            f.write(post_install_template)
             
 
+    def _generate_windows_yaml_update(self, name):
+        yaml_environment=self._parse_yaml()
+        with open(name, "w") as f:
+            yaml.dump(yaml_environment, f)
             
     def _cleanup_environment_yaml(self):
         os.system(f"rm {self.construct_file}")

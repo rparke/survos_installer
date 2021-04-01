@@ -3,10 +3,11 @@ CHANNELS:
 - anaconda
 - defaults
 - conda-forge
-INSTALLER_VERSION: linux
+INSTALLER_VERSION: windows
 LICENSE_FILE: license.txt
 NAME: survos_2_installer
 POST_INSTALL_TEMPLATE_BASH: post_install_template_bash.txt
 POST_INSTALL_TEMPLATE_WINDOWS: post_install_template_bash_windows.txt
 VERSION: 0.0.1
 YAML_ENVIRONMENT: /home/eja26438/Documents/SuRVoS2/survos2_clean_environment_linux.yml
+WINDOWS_RELOCATE: ["pytorch", "torchvision"]
