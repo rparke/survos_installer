@@ -50,10 +50,10 @@ class Installation_Generator():
         self.license_file = license_file
         if installer_version == "windows":
             self.post_install_file = "post_install.bat"
-            self.post_install_template = post_install_template_bash
+            self.post_install_template = post_install_template_windows
         else:
             self.post_install_file = "post_install.sh"
-            self.post_install_template = post_install_template_windows
+            self.post_install_template = post_install_template_bash
         
         self.construct_file = construct_file
         self.installer_version = installer_version
@@ -174,10 +174,11 @@ class Installation_Generator():
                 
 
         #Write template text to post_install file
+
         with open(self.post_install_template) as f:
             for line in f:
                 post_install_template += line
-                
+
 
 
 
@@ -200,6 +201,6 @@ class Installation_Generator():
     
 ig = Installation_Generator(YAML_ENVIRONMENT, NAME, VERSION,CHANNELS, LICENSE_FILE)  
 #ig._generate_constructor_environment_yaml()
-#ig._generate_post_install_script()
+ig._generate_post_install_script()
 #ig.run()
 
