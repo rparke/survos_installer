@@ -112,8 +112,7 @@ class Installation_Generator():
                         add_to_list = False
                 if add_to_list:
                     conda_dependencies_final.append(dependency)
-            return conda_dependencies_final
-        
+            return conda_dependencies_final 
         
     def _get_pip_dependencies(self):
         yaml_environment = self._parse_yaml()
@@ -178,6 +177,13 @@ class Installation_Generator():
         with open(self.post_install_template) as f:
             for line in f:
                 post_install_template += line
+
+
+
+
+        #save the post install script to file
+        with open(self.post_install_file, "w") as f:
+            f.write(post_install_template)
 
 
 
