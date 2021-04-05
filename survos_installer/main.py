@@ -161,17 +161,14 @@ class Installation_Generator():
             self.install_spinner = "install.bat"
             with open(self.install_spinner, "w") as f:
                 spinner_text = "set survos_directory=%CD%\n"
-                spinner_text += f"call {self.name}-{self.version}-Windows-x86_64.exe"
+                spinner_text += f"call {self.name}-{self.version}-Windows-x86_64.exe\n"
                 f.write(spinner_text)
             
             
             #Generate post_install script to manage installation of pip dependencies
             #activate conda environment
             post_install_template = "call %~dp0..\Scripts\activate.bat\n"
-            
-            
-            for dependency in self._get_pip_dependencies():
-                post_install_template += (f"pip install {dependency}\n")
+            post_install_template += f"conda env update -p%dp0..\..\ --file %survos_directory%\{self.windows_yaml_file_name}\n"
                 
 
         #Write template text to post_install file
@@ -208,6 +205,6 @@ class Installation_Generator():
     
 ig = Installation_Generator(YAML_ENVIRONMENT, NAME, VERSION,CHANNELS, LICENSE_FILE)  
 #ig._generate_constructor_environment_yaml()
-ig._generate_post_install_script()
-#ig.run()
+#ig._generate_post_install_script()
+ig.run()
 
