@@ -43,7 +43,7 @@ class Installation_Generator():
                  post_install_template_windows = POST_INSTALL_TEMPLATE_WINDOWS,
                  installer_version = INSTALLER_VERSION,
                  windows_relocate = WINDOWS_RELOCATE,
-                 windows_yaml_file_name = "windows_update.yaml"):
+                 windows_yaml_file_name = "survos2_clean_environment_windows.yml"):
         self.environment_yaml = environment_yaml
         self.name = name
         self.version = version
@@ -204,7 +204,7 @@ class Installation_Generator():
     
     
 ig = Installation_Generator(YAML_ENVIRONMENT, NAME, VERSION,CHANNELS, LICENSE_FILE)  
-#ig._generate_constructor_environment_yaml()
-#ig._generate_post_install_script()
-ig.run()
+ig._generate_constructor_environment_yaml()
+ig._generate_post_install_script()
+#ig.run()
 
